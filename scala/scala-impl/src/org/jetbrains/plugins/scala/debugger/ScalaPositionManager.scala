@@ -28,6 +28,7 @@ import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil._
 import org.jetbrains.plugins.scala.debugger.filters.ScalaDebuggerSettings
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
+import org.jetbrains.plugins.scala.lang.macros.MacroDef
 import org.jetbrains.plugins.scala.lang.psi.ElementScope
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScConstructorPattern, ScInfixPattern}
@@ -40,12 +41,11 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.types.ValueClassType
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.util.macroDebug.ScalaMacroDebuggingUtil
+
 import scala.annotation.tailrec
 import scala.collection.{JavaConverters, mutable}
 import scala.reflect.NameTransformer
 import scala.util.Try
-
-import org.jetbrains.plugins.scala.lang.macros.MacroDef
 
 /**
   * @author ilyas
@@ -629,7 +629,7 @@ class ScalaPositionManager(val debugProcess: DebugProcess) extends PositionManag
     val isScalaObject = originalQName.endsWith("$")
 
     val cacheManager = ScalaShortNamesCacheManager.getInstance(project)
-    val classes = cacheManager.getClassesByName(name, GlobalSearchScope.allScope(project))
+    val classes = cacheManager.getClassesByName(name, GlobalSearchScope.allScope(project)).toSeq
 
     val inSameFile = classes.filter(c => c.isValid && sameFileName(c))
 
