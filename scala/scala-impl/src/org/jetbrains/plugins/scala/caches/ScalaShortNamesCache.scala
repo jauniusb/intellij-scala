@@ -70,14 +70,15 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
     true
   }
 
+  import ScalaIndexKeys._
+
   def getAllClassNames: Array[String] = {
-    val keys = StubIndex.getInstance.getAllKeys(ScalaIndexKeys.ALL_CLASS_NAMES, project)
-    keys.toArray(new Array[String](keys.size()))
+    implicit val projectCopy: Project = project
+    ALL_CLASS_NAMES.keys.toArray
   }
 
-  override def getAllClassNames(dest: HashSet[String]) {
-    val keys = StubIndex.getInstance.getAllKeys(ScalaIndexKeys.ALL_CLASS_NAMES, project)
-    dest.addAll(keys)
+  override def getAllClassNames(dest: HashSet[String]): Unit = {
+    dest.addAll(StubIndex.getInstance.getAllKeys(ALL_CLASS_NAMES, project))
   }
 
   def getMethodsByName(name: String, scope: GlobalSearchScope): Array[PsiMethod] = {

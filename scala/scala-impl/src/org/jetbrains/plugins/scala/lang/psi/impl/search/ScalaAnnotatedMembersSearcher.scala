@@ -5,13 +5,14 @@ package impl
 package search
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiMember
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.AnnotatedElementsSearch
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAnnotation, ScAnnotations}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotations
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
 /**
@@ -35,8 +36,8 @@ class ScalaAnnotatedMembersSearcher extends QueryExecutor[PsiMember, AnnotatedEl
         }
 
         import ScalaIndexKeys._
-        val iter = ANNOTATED_MEMBER_KEY.elements(annClass.name, scope, classOf[ScAnnotation])(annClass.getProject)
-          .iterator
+        implicit val project: Project = annClass.getProject
+        val iter = ANNOTATED_MEMBER_KEY.elements(annClass.name, scope).iterator
         while (iter.hasNext) {
           val annotation = iter.next
           annotation.getParent match {

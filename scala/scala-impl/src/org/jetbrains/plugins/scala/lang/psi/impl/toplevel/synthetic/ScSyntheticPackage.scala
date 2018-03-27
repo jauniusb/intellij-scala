@@ -13,7 +13,6 @@ import com.intellij.psi.scope.PsiScopeProcessor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.IncorrectOperationException
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
@@ -80,9 +79,9 @@ object ScSyntheticPackage {
     }
 
     import ScalaIndexKeys._
-    PACKAGE_FQN_KEY.integerElements(fqn, classOf[ScPackaging]) match {
+    PACKAGE_FQN_KEY.integerElements(fqn) match {
       case seq if seq.isEmpty =>
-        val packages = PACKAGE_OBJECT_KEY.integerElements(fqn, classOf[PsiClass])
+        val packages = PACKAGE_OBJECT_KEY.integerElements(fqn)
         if (packages.exists { pc =>
           ScalaNamesUtil.equivalentFqn(pc.qualifiedName, fqn)
         }) {

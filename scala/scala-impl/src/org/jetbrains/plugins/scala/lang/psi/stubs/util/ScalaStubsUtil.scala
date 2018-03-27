@@ -15,8 +15,6 @@ import com.intellij.util.Processor
 import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.finder.ScalaFilterScope
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSelfTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScExtendsBlock
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScType, ScTypeExt}
@@ -38,8 +36,8 @@ object ScalaStubsUtil {
     val inheritors = new ArrayBuffer[ScTemplateDefinition]
 
     import ScalaIndexKeys._
-    val extendsBlocks = SUPER_CLASS_NAME_KEY.elements(name, scope, classOf[ScExtendsBlock])(clazz.getProject)
-      .iterator
+    implicit val project: Project = clazz.getProject
+    val extendsBlocks = SUPER_CLASS_NAME_KEY.elements(name, scope).iterator
 
     while (extendsBlocks.hasNext) {
       val extendsBlock = extendsBlocks.next
@@ -81,8 +79,7 @@ object ScalaStubsUtil {
         }
         inReadAction {
           import ScalaIndexKeys._
-          val iterator = SELF_TYPE_CLASS_NAME_KEY.elements(name, resolveScope, classOf[ScSelfTypeElement])
-            .iterator
+          val iterator = SELF_TYPE_CLASS_NAME_KEY.elements(name, resolveScope).iterator
           while (iterator.hasNext) {
             val selfTypeElement = iterator.next
             selfTypeElement.typeElement match {

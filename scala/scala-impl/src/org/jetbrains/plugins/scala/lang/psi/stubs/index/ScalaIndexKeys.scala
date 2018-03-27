@@ -19,6 +19,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScOb
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
 import scala.collection.JavaConverters
+import scala.reflect.ClassTag
 
 /**
  * @author ilyas
@@ -52,31 +53,32 @@ object ScalaIndexKeys {
 
   implicit class StubIndexKeyExt[Key, Psi <: PsiElement](private val indexKey: StubIndexKey[Key, Psi]) extends AnyVal {
 
-    def elements(key: Key, scope: GlobalSearchScope,
-                 requiredClass: Class[Psi])
-                (implicit project: Project): Iterable[Psi] = {
-      import JavaConverters._
+    import JavaConverters._
+
+    def elements(key: Key, scope: GlobalSearchScope)
+                (implicit project: Project, tag: ClassTag[Psi]): Iterable[Psi] =
       StubIndex.getElements(indexKey,
         key,
         project,
         ScalaFilterScope(project, scope),
-        requiredClass
+        tag.runtimeClass.asInstanceOf
       ).asScala
-    }
+
+    def keys(implicit project: Project, tag: ClassTag[Psi]) =
+      StubIndex.getInstance.getAllKeys(indexKey, project).asScala
   }
 
   implicit class StubIndexIntegerKeyExt[Psi <: PsiElement](private val indexKey: StubIndexKey[JInteger, Psi]) extends AnyVal {
 
-    def integerElements(name: String, requiredClass: Class[Psi])
-                       (implicit project: Project): Iterable[Psi] =
-      integerElements(name, GlobalSearchScope.allScope(project), requiredClass)
+    def integerElements(name: String)
+                       (implicit project: Project, tag: ClassTag[Psi]): Iterable[Psi] =
+      integerElements(name, GlobalSearchScope.allScope(project))
 
-    def integerElements(name: String, scope: GlobalSearchScope, requiredClass: Class[Psi])
-                       (implicit project: Project): Iterable[Psi] =
+    def integerElements(name: String, scope: GlobalSearchScope)
+                       (implicit project: Project, tag: ClassTag[Psi]): Iterable[Psi] =
       indexKey.elements(
         ScalaNamesUtil.cleanFqn(name).hashCode,
         scope,
-        requiredClass
       )
   }
 }

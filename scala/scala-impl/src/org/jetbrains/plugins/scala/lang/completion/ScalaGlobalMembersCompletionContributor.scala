@@ -139,15 +139,12 @@ object ScalaGlobalMembersCompletionContributor {
     }
   }
 
-  private def implicitElements(reference: ScReferenceExpression)
-                              (implicit project: Project = reference.getProject): Iterable[ScMember] = {
+  private def implicitElements(reference: ScReferenceExpression): Iterable[ScMember] = {
     triggerFeature()
 
+    implicit val project: Project = reference.getProject
     import ScalaIndexKeys._
-    IMPLICITS_KEY.elements("implicit",
-      reference.resolveScope,
-      classOf[ScMember]
-    )
+    IMPLICITS_KEY.elements("implicit", reference.resolveScope)
   }
 
   private def implicitResults(reference: ScReferenceExpression,
